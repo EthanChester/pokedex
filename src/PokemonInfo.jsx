@@ -1,11 +1,11 @@
-function PokemonInfo({ id, handleClick }) {
+function PokemonInfo({ id, name, types, height, weight, handleClick }) {
     return (
         <button onClick={() => handleClick(id)}>
-            <p>001</p>
-            <p>Bulbasaur</p>
-            <p>Type</p>
-            <p>Height</p>
-            <p>Width</p>
+            <p>{id}</p>
+            <p>{name}</p>
+            {/* <p>{types}</p> */}
+            <p>{height}</p>
+            <p>{weight}</p>
         </button>
     );
 }
