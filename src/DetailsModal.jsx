@@ -5,14 +5,15 @@ function DetailsModal({ open, children, handleClick }) {
         return null;
     }
     return (
-        <div
-            className='modal'
-        >
-            {children}
-            <button onClick={handleClick}>
-                X
-            </button>
+        <div className="modalBackground">
+            <div className='modal'>
+                {children}
+                <button onClick={handleClick} className="modalCloseButton">
+                    X
+                </button>
+            </div>
         </div>
+        
     );
 }
 

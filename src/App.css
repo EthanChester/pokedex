@@ -1,24 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
 .App {
     text-align: center;
+    font-family: "Noto Sans", sans-serif;
 }
 
-.App-header {
-    background-color: #282c34;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+body {
+    background-color: #7FDEFF;
 }
+
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 10%;
+    z-index: 1;
+    background-color: #FF3C38;
+    box-shadow: 0px 10px 8px #666666aa;
+}
+
+h1 {
+    font-size: 70;
+    top: 5%;
+}
+
+#searchBar {
+    position: fixed;
+    top: 3.5%;
+    right: 18%;
+    height: 2%;
+    border: 3px solid #fff;
+    border-radius: 2px;
+}
+
+#searchBar:focus {
+    border: 3px solid #555;
+  }
 
 .modal {
     position: fixed;
     top: 50%;
     left: 50%;
     background-color: #ffffff;
-    padding: 50px;
+    padding: 10px;
     z-index: 100;
     transform: translate(-50%, -50%);
+    width: 40%;
+    height: 40%;
+    border-radius: 5px;
+}
+
+.modalBackground {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgb(0, 0, 0, 0.7);
+    width: 100%;
+    height: 100%;
+    z-index: 99;
+}
+
+.pokemonInfo {
+    border: 2px solid #7FDEFF;
+    width: 15%;
+    margin: 0.1%;
+    height: 15%;
+    font-family: "Noto Sans", sans-serif;
+    border-radius: 5px;
+}
+
+.pokemonInfo:hover {
+    border: 2px solid #FF3C38;
+    box-shadow: 5px 10px #888888;
+}
+
+.pokemonInfoContainer {
+    position: absolute;
+    width: 70%;
+    left: 15%;
+    top: 15%;
+    background-color: #7FDEFF;
+}
+
+.pokemonImage {
+    max-width: 100%;
+    height: auto;
+}
+
+.modalContent {
+    display: flex;
+}
+
+.modalCloseButton {
+    position: absolute;
+    right: 2%;
+    top: 2%;
+    background-color: #ffffff;
+    border: none;
+    font-size: 30px;
 }

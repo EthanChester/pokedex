@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./App.css";
 import PokemonInfo from "./PokemonInfo";
 import DetailsModal from "./DetailsModal";
@@ -9,6 +9,8 @@ function App() {
     const [pokemonData, setPokemonData] = useState([]);
     const [error, setError] = useState(null);
     const [dataFetched, setDataFetched] = useState([]);
+    const [selectedPokemon, setSelectedPokemon] = useState(null);
+    const firstLoad = useRef(true);
 
     const numberOfPokemon = 151;
 
@@ -40,14 +42,17 @@ function App() {
                     setDataFetched(...dataFetched, newDataFetched);
                     setPokemonData(...pokemonData, data);
                 }
+                firstLoad.current = false;
                 setIsLoading(false);
             } catch (error) {
                 setError(error);
                 setIsLoading(false);
             }
         }
-        getData();
-    }, []);
+        if (firstLoad.current) {
+            getData();
+        }
+    }, [dataFetched, pokemonData]);
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -57,33 +62,54 @@ function App() {
         return <div>Error: {error.message}</div>;
     }
 
-    const openModal = (id) => {
-        console.log(id);
+    const openModal = (num) => {
+        setSelectedPokemon(pokemonData.find(({ id }) => id === num));
         setModalOpen(true);
+        console.log(selectedPokemon);
     };
 
     return (
         <div className="App">
-            <h1>Title</h1>
             <DetailsModal
                 open={modalOpen}
                 handleClick={() => setModalOpen(false)}
-            >
-                test
+            > 
+            {selectedPokemon ? 
+                <div className="modalContent">
+                    <img className="pokemonImage" src={selectedPokemon.sprites.front_default} alt={selectedPokemon.name} width='400' height='400'/>
+                    <div>
+                        <h2>
+                        {selectedPokemon.name.charAt(0).toUpperCase() + selectedPokemon.name.slice(1)} ({selectedPokemon.id})
+                        </h2>
+                        <h3>Abilities:</h3>
+                        {selectedPokemon.abilities.map(function(element) {
+                            return <p>- {element.ability.name}</p>
+                        })}
+                        <h3>Height: {parseInt(selectedPokemon.height) * 10} cm</h3>
+                        <h3>Weight: {parseInt(selectedPokemon.weight) / 10} kg</h3>
+                    </div>
+                </div>
+            : null}
             </DetailsModal>
-            <div>
-                {pokemonData.map(function(object) {
-                    return <PokemonInfo
-                    key={object.id}
-                    handleClick={openModal}
-                    id={object.id}
-                    name={object.name}
-                    types={object.types}
-                    height={object.height}
-                    weight={object.weight}
-                />;
-                })}
-            </div>
+            <header>
+                <h1>Pokedex</h1>
+                <input type="text" id="searchBar" placeholder="Search" />
+            </header>
+            <body>
+                <div className="pokemonInfoContainer">
+                    {pokemonData.map(function(object) {
+                        return <PokemonInfo
+                        key={object.id}
+                        handleClick={openModal}
+                        id={object.id}
+                        name={object.name}
+                        types={object.types}
+                        height={object.height}
+                        weight={object.weight}
+                    />;
+                    })}
+                </div>
+            </body>
         </div>
     );
 }
