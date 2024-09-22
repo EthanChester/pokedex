@@ -6,53 +6,60 @@ import DetailsModal from "./DetailsModal";
 function App() {
     const [modalOpen, setModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [pokemonData, setPokemonData] = useState([]);
+    const [shownPokemon, setShownPokemon] = useState([]);
     const [error, setError] = useState(null);
     const [dataFetched, setDataFetched] = useState([]);
     const [selectedPokemon, setSelectedPokemon] = useState(null);
-    const firstLoad = useRef(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const loadingData = useRef(false);
+    const pokemonData = useRef([]);
 
     const numberOfPokemon = 151;
 
     useEffect(() => {
         async function getData() {
+            loadingData.current = true;
             try {
                 if (dataFetched.length < numberOfPokemon) {
-                    const data = []
                     const newDataFetched = []
                     for (let i = 1; i < numberOfPokemon + 1; i++) {
                         if (!(i in dataFetched)) {
                             let url = "https://pokeapi.co/api/v2/pokemon/" + i;
-                            try {
-                                const response = await fetch(url);
-                                if (!response.ok) {
-                                    console.log("failed to fetch", i);
-                                } else {
-                                    const json = await response.json();
-                                    if (!(i in dataFetched)) {
-                                        newDataFetched.push(i)
-                                        data.push(json)
-                                    }
+                            const response = await fetch(url);
+                            if (!response.ok) {
+                                console.log("failed to fetch", i);
+                            } else {
+                                const json = await response.json();
+                                if (!(json in pokemonData.current)) {
+                                    newDataFetched.push(i)
+                                    pokemonData.current.push(json)
                                 }
-                            } catch (error) {
-                                console.log(error);
                             }
                         }
                     }
                     setDataFetched(...dataFetched, newDataFetched);
-                    setPokemonData(...pokemonData, data);
                 }
-                firstLoad.current = false;
+                loadingData.current = false;
                 setIsLoading(false);
+                setShownPokemon([...pokemonData.current]);
             } catch (error) {
                 setError(error);
                 setIsLoading(false);
             }
         }
-        if (firstLoad.current) {
+        if (!loadingData.current) {
             getData();
         }
-    }, [dataFetched, pokemonData]);
+    }, [dataFetched]);
+
+    useEffect(() => {
+        if (pokemonData) {
+            const filteredData = pokemonData.current.filter((item) => {
+                return item.name.startsWith(searchTerm) || item.id === parseInt(searchTerm)
+            });
+            setShownPokemon(filteredData);
+        }
+    }, [searchTerm])
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -63,9 +70,8 @@ function App() {
     }
 
     const openModal = (num) => {
-        setSelectedPokemon(pokemonData.find(({ id }) => id === num));
+        setSelectedPokemon(pokemonData.current.find(({ id }) => id === num));
         setModalOpen(true);
-        console.log(selectedPokemon);
     };
 
     return (
@@ -82,8 +88,8 @@ function App() {
                         {selectedPokemon.name.charAt(0).toUpperCase() + selectedPokemon.name.slice(1)} ({selectedPokemon.id})
                         </h2>
                         <h3>Abilities:</h3>
-                        {selectedPokemon.abilities.map(function(element) {
-                            return <p>- {element.ability.name}</p>
+                        {selectedPokemon.abilities.map(function(element, i) {
+                            return <p key={i}>- {element.ability.name}</p>
                         })}
                         <h3>Height: {parseInt(selectedPokemon.height) * 10} cm</h3>
                         <h3>Weight: {parseInt(selectedPokemon.weight) / 10} kg</h3>
@@ -93,11 +99,11 @@ function App() {
             </DetailsModal>
             <header>
                 <h1>Pokedex</h1>
-                <input type="text" id="searchBar" placeholder="Search" />
+                <input type="text" id="searchBar" placeholder="Search" onChange={e => setSearchTerm(e.target.value)} />
             </header>
             <body>
                 <div className="pokemonInfoContainer">
-                    {pokemonData.map(function(object) {
+                    {shownPokemon ? shownPokemon.map(function(object) {
                         return <PokemonInfo
                         key={object.id}
                         handleClick={openModal}
@@ -107,7 +113,7 @@ function App() {
                         height={object.height}
                         weight={object.weight}
                     />;
-                    })}
+                    }): null}
                 </div>
             </body>
         </div>
