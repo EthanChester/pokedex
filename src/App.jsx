@@ -98,7 +98,7 @@ function App() {
             : null}
             </DetailsModal>
             <header>
-                <h1>Pokedex</h1>
+                <h1>Pokédex</h1>
                 <input type="text" id="searchBar" placeholder="Search" onChange={e => setSearchTerm(e.target.value)} />
             </header>
             <body>
